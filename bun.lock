@@ -1,0 +1,20 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "takumi-sharp",
+    },
+    "takumi-native": {
+      "name": "takumi-native",
+    },
+    "takumi-sharp": {
+      "name": "takumi-sharp",
+    },
+  },
+  "packages": {
+    "takumi-native": ["takumi-native@workspace:takumi-native"],
+
+    "takumi-sharp": ["takumi-sharp@workspace:takumi-sharp"],
+  }
+}

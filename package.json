@@ -1,0 +1,8 @@
+{
+  "name": "takumi-sharp",
+  "type": "module",
+  "workspaces": [
+    "takumi-native",
+    "takumi-sharp"
+  ]
+}
