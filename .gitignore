@@ -1,6 +1,18 @@
 # dependencies (bun install)
 node_modules
 
+**/*.dll
+**/*.so
+**/*.dylib
+**/*.lib
+**/*.a
+**/*.o
+**/*.obj
+**/*.pdb
+**/*.d
+**/*.rlib
+**/target
+
 # output
 out
 dist

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TakumiSharp.Native", "Takum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TakumiSharp", "TakumiSharp\TakumiSharp.csproj", "{D5FEBF9C-AAA2-4C5C-9AE1-368C15CACEF1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TakumiSharp.Example", "TakumiSharp.Example\TakumiSharp.Example.csproj", "{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{D5FEBF9C-AAA2-4C5C-9AE1-368C15CACEF1}.Release|x64.Build.0 = Release|Any CPU
 		{D5FEBF9C-AAA2-4C5C-9AE1-368C15CACEF1}.Release|x86.ActiveCfg = Release|Any CPU
 		{D5FEBF9C-AAA2-4C5C-9AE1-368C15CACEF1}.Release|x86.Build.0 = Release|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Debug|x64.Build.0 = Debug|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Debug|x86.Build.0 = Debug|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Release|x64.ActiveCfg = Release|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Release|x64.Build.0 = Release|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Release|x86.ActiveCfg = Release|Any CPU
+		{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
