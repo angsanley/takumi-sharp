@@ -1,4 +1,5 @@
-﻿using TakumiSharp.Native;
+﻿using System.Text;
+using TakumiSharp.Native;
 
 namespace TakumiSharp;
 
@@ -21,10 +22,7 @@ public static class Takumi
         }
 
         byte[] fontData = File.ReadAllBytes(fontPath);
-        if (!TakumiSharpNative.LoadFont(fontData))
-        {
-            throw new InvalidOperationException($"Failed to load font from: {fontPath}");
-        }
+        LoadFont(fontData);
     }
 
     /// <summary>
@@ -32,9 +30,15 @@ public static class Takumi
     /// </summary>
     /// <param name="fontData">The font file bytes</param>
     /// <exception cref="InvalidOperationException">Thrown when the font fails to load</exception>
-    public static void LoadFont(ReadOnlySpan<byte> fontData)
+    public static unsafe void LoadFont(ReadOnlySpan<byte> fontData)
     {
-        if (!TakumiSharpNative.LoadFont(fontData))
+        bool success;
+        fixed (byte* dataPtr = fontData)
+        {
+            success = Generated.global_font_context_load_and_store(dataPtr, (nuint)fontData.Length);
+        }
+
+        if (!success)
         {
             throw new InvalidOperationException("Failed to load font data");
         }
@@ -51,7 +55,7 @@ public static class Takumi
     /// <param name="format">Output image format (default: PNG)</param>
     /// <returns>The encoded image data</returns>
     /// <exception cref="InvalidOperationException">Thrown when rendering fails</exception>
-    public static byte[] Render(
+    public static unsafe byte[] Render(
         string nodeJson,
         int? width = null,
         int? height = null,
@@ -67,13 +71,33 @@ public static class Takumi
             device_pixel_ratio = devicePixelRatio,
         };
 
-        byte[]? result = TakumiSharpNative.RenderToBytes(nodeJson, viewport, format);
-        if (result == null)
+        byte[] nodeBytes = Encoding.UTF8.GetBytes(nodeJson + '\0');
+
+        ulong size;
+        fixed (byte* nodePtr = nodeBytes)
+        {
+            size = Generated.render_calculate_buffer_size_with_format(nodePtr, viewport, format);
+        }
+
+        if (size == 0)
+        {
+            throw new InvalidOperationException("Failed to calculate buffer size for rendering");
+        }
+
+        byte[] buffer = new byte[size];
+        bool success;
+        fixed (byte* nodePtr = nodeBytes)
+        fixed (byte* bufferPtr = buffer)
+        {
+            success = Generated.render_to_buffer_with_format(nodePtr, viewport, format, bufferPtr, size);
+        }
+
+        if (!success)
         {
             throw new InvalidOperationException("Failed to render node");
         }
 
-        return result;
+        return buffer;
     }
 
     /// <summary>

@@ -5,6 +5,6 @@ fn main() {
         .csharp_class_accessibility("public")
         .csharp_namespace("TakumiSharp.Native")
         .csharp_class_name("Generated")
-        .generate_csharp_file("../takumi-sharp/TakumiSharp.Native/TakumiSharp.g.cs")
+        .generate_csharp_file("../takumi-sharp/TakumiSharp/TakumiSharp.g.cs")
         .unwrap()
 }
