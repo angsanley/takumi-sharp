@@ -51,7 +51,7 @@ fn main() {
     // Load fonts
     global
         .font_context
-        .load_and_store(include_bytes!("../font.ttf"), None, None)
+        .load_and_store(include_bytes!("font.ttf"), None, None)
         .unwrap();
 
     // Create a viewport

@@ -1,6 +1,6 @@
 use std::{ffi::CStr, sync::LazyLock};
 
-use takumi::{GlobalContext, layout::node::NodeKind, rendering::RenderOptionsBuilder};
+use takumi::{layout::node::NodeKind, rendering::RenderOptionsBuilder, GlobalContext};
 
 static mut GLOBAL_CONTEXT: LazyLock<GlobalContext> = LazyLock::new(GlobalContext::default);
 static mut GLOBAL_LAST_ERROR: String = String::new();
@@ -22,8 +22,16 @@ pub struct Viewport {
 impl From<Viewport> for takumi::layout::Viewport {
     fn from(value: Viewport) -> Self {
         Self {
-            width: if value.width < 0 { None } else { Some(value.width as u32) },
-            height: if value.height < 0 { None } else { Some(value.height as u32) },
+            width: if value.width < 0 {
+                None
+            } else {
+                Some(value.width as u32)
+            },
+            height: if value.height < 0 {
+                None
+            } else {
+                Some(value.height as u32)
+            },
             font_size: value.font_size,
             device_pixel_ratio: value.device_pixel_ratio,
         }
@@ -100,7 +108,6 @@ impl From<ImageFormat> for takumi::image::ImageFormat {
     }
 }
 
-
 /// Loads and stores font data into the global font context.
 ///
 /// # Safety
@@ -108,10 +115,7 @@ impl From<ImageFormat> for takumi::image::ImageFormat {
 /// - `data` must be a valid pointer to a byte array of at least `len` bytes.
 /// - The data must remain valid for the duration of this call.
 #[no_mangle]
-pub unsafe extern "C" fn global_font_context_load_and_store(
-    data: *const u8,
-    len: usize,
-) -> bool {
+pub unsafe extern "C" fn global_font_context_load_and_store(data: *const u8, len: usize) -> bool {
     let data_arr = unsafe { std::slice::from_raw_parts(data, len) };
     if let Err(e) = unsafe { &mut *std::ptr::addr_of_mut!(GLOBAL_CONTEXT) }
         .font_context

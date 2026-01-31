@@ -1,23 +1,21 @@
 ﻿using TakumiSharp;
+using TakumiSharp.Models;
 
-Takumi.LoadFont("font.ttf");
+Takumi.LoadFont("path/to/your/font.ttf");
 
-string nodeJson = """
+var imageData = Takumi.Render(
+    node: new ContainerNode
     {
-        "type": "text",
-        "children": null,
-        "text": "Hello, Takumi!",
-        "props": null,
-        "key": null
-    }
-    """;
-
-Takumi.RenderToFile(
-    nodeJson,
-    "hello_takumi.png",
-    width: 200,
-    height: 100,
-    fontSize: 24f
+      Children = [
+        new TextNode
+        {
+          Text = "Hello, TakumiSharp!",
+        }
+      ]
+    },
+    width: 400,
+    height: 200,
+    format: ImageFormat.Png
 );
 
-Console.WriteLine("Saved to hello_takumi.png");
+await File.WriteAllBytesAsync("output.png", imageData);

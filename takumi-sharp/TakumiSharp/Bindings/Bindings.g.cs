@@ -8,9 +8,9 @@ using System;
 using System.Runtime.InteropServices;
 
 
-namespace TakumiSharp.Native
+namespace TakumiSharp.Bindings
 {
-    public static unsafe partial class Generated
+    internal static unsafe partial class NativeBindings
     {
         const string __DllName = "libtakumi";
 
@@ -28,7 +28,7 @@ namespace TakumiSharp.Native
         /// </summary>
         [DllImport(__DllName, EntryPoint = "global_font_context_load_and_store", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool global_font_context_load_and_store(byte* data, nuint len);
+        internal static extern bool global_font_context_load_and_store(byte* data, nuint len);
 
         /// <summary>
         ///  Calculates the required buffer size for rendering a node to an image.
@@ -38,7 +38,7 @@ namespace TakumiSharp.Native
         ///  - `node_str` must be a valid null-terminated C string pointer.
         /// </summary>
         [DllImport(__DllName, EntryPoint = "render_calculate_buffer_size_with_format", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern ulong render_calculate_buffer_size_with_format(byte* node_str, Viewport viewport, ImageFormat format);
+        internal static extern ulong render_calculate_buffer_size_with_format(byte* node_str, Viewport viewport, ImageFormat format);
 
         /// <summary>
         ///  Renders a node to an image and writes it to a buffer.
@@ -51,7 +51,7 @@ namespace TakumiSharp.Native
         /// </summary>
         [DllImport(__DllName, EntryPoint = "render_to_buffer_with_format", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool render_to_buffer_with_format(byte* node_str, Viewport viewport, ImageFormat format, byte* out_buffer, ulong buffer_len);
+        internal static extern bool render_to_buffer_with_format(byte* node_str, Viewport viewport, ImageFormat format, byte* out_buffer, ulong buffer_len);
 
 
     }
@@ -60,7 +60,7 @@ namespace TakumiSharp.Native
     ///  The viewport for the image renderer.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe partial struct Viewport
+    internal unsafe partial struct Viewport
     {
         /// <summary>
         ///  The width of the viewport in pixels, or -1 for none/auto.
@@ -81,7 +81,7 @@ namespace TakumiSharp.Native
     }
 
 
-    public enum ImageFormat : byte
+    internal enum ImageFormat : byte
     {
         /// <summary>
         ///  An Image in PNG Format
