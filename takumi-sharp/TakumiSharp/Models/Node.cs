@@ -24,7 +24,7 @@ namespace TakumiSharp.Models
     public List<NodeKind>? Children { get; set; }
 
     [JsonPropertyName("tw")]
-    public TailwindValues? Tw { get; set; }
+    public string? Tw { get; set; }
   }
 
   // Text node
@@ -40,7 +40,7 @@ namespace TakumiSharp.Models
     public string Text { get; set; } = string.Empty;
 
     [JsonPropertyName("tw")]
-    public TailwindValues? Tw { get; set; }
+    public string? Tw { get; set; }
   }
 
   // Image node
@@ -62,10 +62,10 @@ namespace TakumiSharp.Models
     public float? Height { get; set; }
 
     [JsonPropertyName("tw")]
-    public TailwindValues? Tw { get; set; }
+    public string? Tw { get; set; }
   }
 
-  // Placeholder for Style and TailwindValues (to be implemented)
+  // Placeholder for Style (to be implemented)
   public class Style { }
-  public class TailwindValues { }
+  // public class TailwindValues { } // TODO: Implement TailwindValues if needed
 }

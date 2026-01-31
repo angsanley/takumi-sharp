@@ -1,7 +1,7 @@
 ﻿using TakumiSharp;
 using TakumiSharp.Models;
 
-Takumi.LoadFont("path/to/your/font.ttf");
+Takumi.LoadFont("font.ttf");
 
 var imageData = Takumi.Render(
     node: new ContainerNode
@@ -10,6 +10,7 @@ var imageData = Takumi.Render(
         new TextNode
         {
           Text = "Hello, TakumiSharp!",
+          Tw = "text-4xl font-bold text-center text-blue-600"
         }
       ]
     },
