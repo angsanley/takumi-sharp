@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TakumiSharp\TakumiSharp.csproj" />
+    <ProjectReference Include="..\TakumiSharp.Native\TakumiSharp.Native.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

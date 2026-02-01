@@ -12,7 +12,7 @@ namespace TakumiSharp.Bindings
 {
     internal static unsafe partial class NativeBindings
     {
-        const string __DllName = "libtakumi";
+        const string __DllName = "takumi";
 
 
 
