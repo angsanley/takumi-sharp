@@ -30,4 +30,4 @@ var imageData = Takumi.Render(
     format: ImageFormat.Png
 );
 
-await File.WriteAllBytesAsync("output.png", imageData);
+await File.WriteAllBytesAsync("output.png", imageData); 
