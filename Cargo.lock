@@ -1578,6 +1578,7 @@ dependencies = [
  "libc",
  "serde",
  "serde_json",
+ "syn",
  "takumi",
 ]
 

@@ -40,6 +40,9 @@ namespace TakumiSharp.Bindings
         [DllImport(__DllName, EntryPoint = "render_calculate_buffer_size_with_format", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         internal static extern ulong render_calculate_buffer_size_with_format(byte* node_str, Viewport viewport, ImageFormat format);
 
+        [DllImport(__DllName, EntryPoint = "get_last_error", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        internal static extern byte* get_last_error();
+
         /// <summary>
         ///  Renders a node to an image and writes it to a buffer.
         ///

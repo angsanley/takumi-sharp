@@ -3,7 +3,12 @@ use std::{ffi::CStr, sync::LazyLock};
 use takumi::{layout::node::NodeKind, rendering::RenderOptionsBuilder, GlobalContext};
 
 static mut GLOBAL_CONTEXT: LazyLock<GlobalContext> = LazyLock::new(GlobalContext::default);
-static mut GLOBAL_LAST_ERROR: String = String::new();
+static mut GLOBAL_LAST_ERROR: Option<std::ffi::CString> = None;
+
+unsafe fn set_last_error(err: impl std::fmt::Display) {
+    let s = err.to_string();
+    GLOBAL_LAST_ERROR = Some(std::ffi::CString::new(s).unwrap_or_else(|_| std::ffi::CString::new("Error creating error string").unwrap()));
+}
 
 /// The viewport for the image renderer.
 #[repr(C)]
@@ -121,7 +126,7 @@ pub unsafe extern "C" fn global_font_context_load_and_store(data: *const u8, len
         .font_context
         .load_and_store(data_arr, None, None)
     {
-        unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = e.to_string() };
+        unsafe { set_last_error(e) };
         return false;
     }
     true
@@ -139,17 +144,24 @@ pub unsafe extern "C" fn render_calculate_buffer_size_with_format(
     format: ImageFormat,
 ) -> u64 {
     if node_str.is_null() {
+        unsafe { set_last_error("node_str is null") };
         return 0;
     }
 
     let node_str = match CStr::from_ptr(node_str).to_str() {
         Ok(s) => s,
-        Err(_) => return 0,
+        Err(e) => {
+            unsafe { set_last_error(e) };
+            return 0;
+        }
     };
 
     let node: NodeKind = match serde_json::from_str(node_str) {
         Ok(n) => n,
-        Err(_) => return 0,
+        Err(e) => {
+            unsafe { set_last_error(e) };
+            return 0;
+        }
     };
 
     let opt = match RenderOptionsBuilder::default()
@@ -160,7 +172,7 @@ pub unsafe extern "C" fn render_calculate_buffer_size_with_format(
     {
         Ok(o) => o,
         Err(e) => {
-            unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = e.to_string() };
+            unsafe { set_last_error(e) };
             return 0;
         }
     };
@@ -170,18 +182,26 @@ pub unsafe extern "C" fn render_calculate_buffer_size_with_format(
     let image = match takumi::rendering::render(opt) {
         Ok(img) => img,
         Err(e) => {
-            unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = e.to_string() };
+            unsafe { set_last_error(e) };
             return 0;
         }
     };
 
     let mut cursor = std::io::Cursor::new(Vec::new());
     if let Err(e) = image.write_to(&mut cursor, img_format) {
-        unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = e.to_string() };
+        unsafe { set_last_error(e) };
         return 0;
     }
 
     cursor.into_inner().len() as u64
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn get_last_error() -> *const std::ffi::c_char {
+    match unsafe { &*std::ptr::addr_of!(GLOBAL_LAST_ERROR) } {
+        Some(s) => s.as_ptr(),
+        None => std::ptr::null(),
+    }
 }
 
 /// Renders a node to an image and writes it to a buffer.
@@ -200,17 +220,24 @@ pub unsafe extern "C" fn render_to_buffer_with_format(
     buffer_len: u64,
 ) -> bool {
     if node_str.is_null() || out_buffer.is_null() || buffer_len == 0 {
+         unsafe { set_last_error("Invalid arguments: null pointer or zero buffer length") };
         return false;
     }
 
     let node_str = match CStr::from_ptr(node_str).to_str() {
         Ok(s) => s,
-        Err(_) => return false,
+        Err(e) => {
+            unsafe { set_last_error(e) };
+            return false;
+        }
     };
 
     let node: NodeKind = match serde_json::from_str(node_str) {
         Ok(n) => n,
-        Err(_) => return false,
+        Err(e) => {
+            unsafe { set_last_error(e) };
+            return false;
+        }
     };
 
     let opt = match RenderOptionsBuilder::default()
@@ -221,7 +248,7 @@ pub unsafe extern "C" fn render_to_buffer_with_format(
     {
         Ok(o) => o,
         Err(e) => {
-            unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = e.to_string() };
+            unsafe { set_last_error(e) };
             return false;
         }
     };
@@ -231,20 +258,20 @@ pub unsafe extern "C" fn render_to_buffer_with_format(
     let image = match takumi::rendering::render(opt) {
         Ok(img) => img,
         Err(e) => {
-            unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = e.to_string() };
+             unsafe { set_last_error(e) };
             return false;
         }
     };
 
     let mut cursor = std::io::Cursor::new(Vec::new());
     if let Err(e) = image.write_to(&mut cursor, img_format) {
-        unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = e.to_string() };
+         unsafe { set_last_error(e) };
         return false;
     }
 
     let bytes = cursor.into_inner();
     if bytes.len() > buffer_len as usize {
-        unsafe { *std::ptr::addr_of_mut!(GLOBAL_LAST_ERROR) = "Buffer too small".to_string() };
+        unsafe { set_last_error("Buffer too small") };
         return false;
     }
 

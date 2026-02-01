@@ -1,23 +1,20 @@
 use takumi::{
-    image::ImageFormat,
-    layout::{node::NodeKind, Viewport},
-    rendering::{render, RenderOptionsBuilder},
-    GlobalContext,
+    GlobalContext, image::ImageFormat, layout::{Viewport, node::{ContainerNode, NodeKind, TextNode}}, rendering::{RenderOptionsBuilder, render}
 };
 
 fn main() {
     // Create a node tree with `ContainerNode` and `TextNode`
-    // let mut node = NodeKind::Container(ContainerNode {
-    //     children: Some(Box::from([NodeKind::Text(TextNode {
-    //         text: "Hello, world!".to_string(),
-    //         style: None, // Construct with `StyleBuilder`
-    //         tw: None,    // Tailwind properties
-    //         preset: None,
-    //     })])),
-    //     preset: None,
-    //     style: None,
-    //     tw: None, // Tailwind properties
-    // });
+    let mut node = NodeKind::Container(ContainerNode {
+        children: Some(Box::from([NodeKind::Text(TextNode {
+            text: "Hello, world!".to_string(),
+            style: None, // Construct with `StyleBuilder`
+            tw: None,    // Tailwind properties
+            preset: None,
+        })])),
+        preset: None,
+        style: None,
+        tw: None, // Tailwind properties
+    });
     // let mut node = NodeKind::Container(
     //     ContainerNode {
     //         children: None,

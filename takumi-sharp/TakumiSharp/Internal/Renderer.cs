@@ -37,7 +37,9 @@ internal class Renderer
 
     if (!success)
     {
-      throw new InvalidOperationException("Failed to load font data");
+      var errorPtr = (nint)NativeBindings.get_last_error();
+      var errorMsg = errorPtr != 0 ? System.Runtime.InteropServices.Marshal.PtrToStringUTF8(errorPtr) : "Unknown error";
+      throw new InvalidOperationException($"Failed to load font data: {errorMsg}");
     }
   }
 
@@ -78,7 +80,9 @@ internal class Renderer
 
     if (size == 0)
     {
-      throw new InvalidOperationException("Failed to calculate buffer size for rendering");
+      var errorPtr = (nint)NativeBindings.get_last_error();
+      var errorMsg = errorPtr != 0 ? System.Runtime.InteropServices.Marshal.PtrToStringUTF8(errorPtr) : "Unknown error";
+      throw new InvalidOperationException($"Failed to calculate buffer size for rendering: {errorMsg}");
     }
 
     byte[] buffer = new byte[size];
@@ -91,7 +95,9 @@ internal class Renderer
 
     if (!success)
     {
-      throw new InvalidOperationException("Failed to render node");
+      var errorPtr = (nint)NativeBindings.get_last_error();
+      var errorMsg = errorPtr != 0 ? System.Runtime.InteropServices.Marshal.PtrToStringUTF8(errorPtr) : "Unknown error";
+      throw new InvalidOperationException($"Failed to render node: {errorMsg}");
     }
 
     return buffer;
