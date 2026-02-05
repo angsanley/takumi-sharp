@@ -1,14 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\TakumiSharp.Native\TakumiSharp.Native.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <PackageId>TakumiSharp</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Stanley Ang</Authors>
+    <Description>C# bindings for Takumi, a high-performance image rendering library.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TakumiSharp.Native\TakumiSharp.Native.csproj" />
+  </ItemGroup>
 </Project>

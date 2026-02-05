@@ -1,76 +1,75 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-      <PropertyGroup>
-            <TargetFramework>net10.0</TargetFramework>
-            <ImplicitUsings>enable</ImplicitUsings>
-            <Nullable>enable</Nullable>
-            <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- NuGet Package Metadata -->
+    <PackageId>TakumiSharp.Native</PackageId>
+    <Version>0.0.1</Version>
+    <Description>Native runtime libraries for TakumiSharp</Description>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
 
-            <!-- NuGet Package Metadata -->
-            <PackageId>TakumiSharp.Native</PackageId>
-            <Version>1.0.0</Version>
-            <Description>Native runtime libraries for TakumiSharp</Description>
-            <IncludeContentInPack>true</IncludeContentInPack>
-            <IncludeBuildOutput>false</IncludeBuildOutput>
-      </PropertyGroup>
+  <!-- Include native libraries for each platform -->
+  <ItemGroup>
+    <!-- Windows x64 -->
+    <None Include="runtimes/win-x64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/win-x64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/win-x64/native')" />
 
-      <!-- Include native libraries for each platform -->
-      <ItemGroup>
-            <!-- Windows x64 -->
-            <None Include="runtimes/win-x64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/win-x64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/win-x64/native')" />
+    <!-- Linux x64 -->
+    <None Include="runtimes/linux-x64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/linux-x64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/linux-x64/native')" />
 
-            <!-- Linux x64 -->
-            <None Include="runtimes/linux-x64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/linux-x64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/linux-x64/native')" />
+    <!-- macOS x64 -->
+    <None Include="runtimes/osx-x64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/osx-x64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/osx-x64/native')" />
 
-            <!-- macOS x64 -->
-            <None Include="runtimes/osx-x64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/osx-x64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/osx-x64/native')" />
+    <!-- macOS ARM64 (Apple Silicon) -->
+    <None Include="runtimes/osx-arm64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/osx-arm64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/osx-arm64/native')" />
 
-            <!-- macOS ARM64 (Apple Silicon) -->
-            <None Include="runtimes/osx-arm64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/osx-arm64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/osx-arm64/native')" />
+    <!-- Linux ARM64 -->
+    <None Include="runtimes/linux-arm64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/linux-arm64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/linux-arm64/native')" />
 
-            <!-- Linux ARM64 -->
-            <None Include="runtimes/linux-arm64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/linux-arm64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/linux-arm64/native')" />
+    <!-- Linux musl x64 (Alpine) -->
+    <None Include="runtimes/linux-musl-x64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/linux-musl-x64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/linux-musl-x64/native')" />
 
-            <!-- Linux musl x64 (Alpine) -->
-            <None Include="runtimes/linux-musl-x64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/linux-musl-x64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/linux-musl-x64/native')" />
+    <!-- Linux musl ARM64 (Alpine) -->
+    <None Include="runtimes/linux-musl-arm64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/linux-musl-arm64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/linux-musl-arm64/native')" />
 
-            <!-- Linux musl ARM64 (Alpine) -->
-            <None Include="runtimes/linux-musl-arm64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/linux-musl-arm64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/linux-musl-arm64/native')" />
-
-            <!-- Windows ARM64 -->
-            <None Include="runtimes/win-arm64/native/**/*"
-                  Pack="true"
-                  PackagePath="runtimes/win-arm64/native"
-                  CopyToOutputDirectory="PreserveNewest"
-                  Condition="Exists('runtimes/win-arm64/native')" />
-      </ItemGroup>
-
+    <!-- Windows ARM64 -->
+    <None Include="runtimes/win-arm64/native/**/*"
+      Pack="true"
+      PackagePath="runtimes/win-arm64/native"
+      CopyToOutputDirectory="PreserveNewest"
+      Condition="Exists('runtimes/win-arm64/native')" />
+  </ItemGroup>
 </Project>
