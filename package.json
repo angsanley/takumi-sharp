@@ -4,5 +4,11 @@
   "workspaces": [
     "takumi-native",
     "takumi-sharp"
-  ]
+  ],
+  "scripts": {
+    "build:native": "./scripts/build-natives.sh",
+    "build:native:all": "./scripts/build-natives.sh --all",
+    "build:native:debug": "./scripts/build-natives.sh --debug",
+    "build:native:clean": "./scripts/build-natives.sh --clean --all"
+  }
 }
