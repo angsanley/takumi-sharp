@@ -1,3 +1,14 @@
 [workspace]
 members = ["takumi-native"]
 resolver = "3"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+debug = false
+debug-assertions = false
+incremental = false

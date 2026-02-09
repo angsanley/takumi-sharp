@@ -196,6 +196,11 @@ pub unsafe extern "C" fn render_calculate_buffer_size_with_format(
     cursor.into_inner().len() as u64
 }
 
+/// Returns the last error that occurred in the global context.
+///
+/// # Safety
+///
+/// - The returned pointer must not be used after the global context is dropped.
 #[no_mangle]
 pub unsafe extern "C" fn get_last_error() -> *const std::ffi::c_char {
     match unsafe { &*std::ptr::addr_of!(GLOBAL_LAST_ERROR) } {

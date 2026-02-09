@@ -202,7 +202,6 @@ struct FieldDef {
 
 #[derive(Debug, Clone)]
 struct EnumDef {
-    name: String,
     variants: Vec<EnumVariant>,
     #[allow(dead_code)]
     serde_attrs: SerdeAttrs,
@@ -323,7 +322,6 @@ impl CSharpGenerator {
         self.enums.insert(
             name.clone(),
             EnumDef {
-                name,
                 variants,
                 serde_attrs,
             },
