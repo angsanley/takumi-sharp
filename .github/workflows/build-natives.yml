@@ -136,9 +136,16 @@ jobs:
           name: takumi-native-all
           path: takumi-sharp/TakumiSharp.Native/runtimes/
 
+      - name: Generate version suffix
+        id: version
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "suffix=ci.${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "Generated version suffix: ci.${SHORT_SHA}"
+
       - name: Pack NuGet package
         working-directory: takumi-sharp/TakumiSharp.Native
-        run: dotnet pack -c Release -o ./nupkg
+        run: dotnet pack -c Release -o ./nupkg /p:VersionSuffix=${{ steps.version.outputs.suffix }}
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v4

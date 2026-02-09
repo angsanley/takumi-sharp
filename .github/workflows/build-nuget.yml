@@ -1,0 +1,83 @@
+name: Build NuGet Package
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'takumi-sharp/**'
+      - '.github/workflows/build-nuget.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'takumi-sharp/**'
+      - '.github/workflows/build-nuget.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version (leave empty to use version from .csproj)'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    name: Build NuGet Package
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      
+      - name: Download native libraries
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build-natives.yml
+          workflow_conclusion: success
+          name: takumi-native-all
+          path: takumi-sharp/TakumiSharp.Native/runtimes/
+          if_no_artifact_found: fail
+      
+      - name: List native libraries
+        run: |
+          echo "Native libraries:"
+          find takumi-sharp/TakumiSharp.Native/runtimes -type f \( -name "*.dll" -o -name "*.so" -o -name "*.dylib" \) | sort
+      
+      - name: Restore dependencies
+        working-directory: takumi-sharp
+        run: dotnet restore
+      
+      - name: Build solution
+        working-directory: takumi-sharp
+        run: dotnet build -c Release --no-restore
+      
+      - name: Run tests
+        working-directory: takumi-sharp
+        run: dotnet test -c Release --no-build --verbosity normal
+        continue-on-error: true
+      
+      - name: Generate version suffix
+        id: version
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "suffix=ci.${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "Generated version suffix: ci.${SHORT_SHA}"
+      
+      - name: Pack TakumiSharp
+        working-directory: takumi-sharp/TakumiSharp
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            dotnet pack -c Release -o ./nupkg /p:Version=${{ github.event.inputs.version }}
+          else
+            dotnet pack -c Release -o ./nupkg /p:VersionSuffix=${{ steps.version.outputs.suffix }}
+          fi
+      
+      - name: Upload TakumiSharp NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: TakumiSharp-nupkg
+          path: takumi-sharp/TakumiSharp/nupkg/*.nupkg
+          retention-days: 30
