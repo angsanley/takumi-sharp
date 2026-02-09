@@ -1,0 +1,195 @@
+name: Build Native Libraries
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'takumi-native/**'
+      - '.github/workflows/build-natives.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'takumi-native/**'
+      - '.github/workflows/build-natives.yml'
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: 'Targets to build (comma-separated, or "all")'
+        required: false
+        default: 'all'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-matrix:
+    name: Build ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            os: windows-latest
+            rust-target: x86_64-pc-windows-msvc
+            lib-name: takumi.dll
+          - rid: win-arm64
+            os: windows-latest
+            rust-target: aarch64-pc-windows-msvc
+            lib-name: takumi.dll
+          - rid: linux-x64
+            os: ubuntu-latest
+            rust-target: x86_64-unknown-linux-gnu
+            lib-name: libtakumi.so
+          - rid: linux-arm64
+            os: ubuntu-latest
+            rust-target: aarch64-unknown-linux-gnu
+            lib-name: libtakumi.so
+            cross-compile: glibc-arm64
+          - rid: linux-musl-x64
+            os: ubuntu-latest
+            rust-target: x86_64-unknown-linux-musl
+            lib-name: libtakumi.so
+            cross-compile: musl-x64
+          - rid: linux-musl-arm64
+            os: ubuntu-latest
+            rust-target: aarch64-unknown-linux-musl
+            lib-name: libtakumi.so
+            cross-compile: musl-arm64
+          - rid: osx-x64
+            os: macos-latest
+            rust-target: x86_64-apple-darwin
+            lib-name: libtakumi.dylib
+          - rid: osx-arm64
+            os: macos-latest
+            rust-target: aarch64-apple-darwin
+            lib-name: libtakumi.dylib
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-action@stable
+        with:
+          targets: ${{ matrix.rust-target }}
+
+      - name: Install cross-compilation tools (Linux glibc ARM64)
+        if: matrix.cross-compile == 'glibc-arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Install cross-compilation tools (Linux musl x64)
+        if: matrix.cross-compile == 'musl-x64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Install cross-compilation tools (Linux musl ARM64)
+        if: matrix.cross-compile == 'musl-arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          # Install musl cross-compiler for ARM64
+          wget -q https://musl.cc/aarch64-linux-musl-cross.tgz
+          tar -xzf aarch64-linux-musl-cross.tgz
+          echo "$PWD/aarch64-linux-musl-cross/bin" >> $GITHUB_PATH
+
+      - name: Configure cross-compilation (Linux glibc ARM64)
+        if: matrix.cross-compile == 'glibc-arm64'
+        run: |
+          mkdir -p .cargo
+          cat >> .cargo/config.toml << EOF
+          [target.aarch64-unknown-linux-gnu]
+          linker = "aarch64-linux-gnu-gcc"
+          EOF
+
+      - name: Configure cross-compilation (Linux musl ARM64)
+        if: matrix.cross-compile == 'musl-arm64'
+        run: |
+          mkdir -p .cargo
+          cat >> .cargo/config.toml << EOF
+          [target.aarch64-unknown-linux-musl]
+          linker = "aarch64-linux-musl-gcc"
+          EOF
+
+      - name: Build native library
+        working-directory: takumi-native
+        run: cargo build --release --target ${{ matrix.rust-target }}
+
+      - name: Create runtime directory
+        shell: bash
+        run: mkdir -p takumi-sharp/TakumiSharp.Native/runtimes/${{ matrix.rid }}/native
+
+      - name: Copy native library
+        shell: bash
+        run: |
+          cp target/${{ matrix.rust-target }}/release/${{ matrix.lib-name }} \
+             takumi-sharp/TakumiSharp.Native/runtimes/${{ matrix.rid }}/native/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: takumi-sharp/TakumiSharp.Native/runtimes/${{ matrix.rid }}/
+          retention-days: 7
+
+  collect-artifacts:
+    name: Collect All Native Libraries
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: takumi-sharp/TakumiSharp.Native/runtimes/
+          pattern: native-*
+          merge-multiple: true
+
+      - name: List collected artifacts
+        run: |
+          echo "Collected native libraries:"
+          find takumi-sharp/TakumiSharp.Native/runtimes -type f -name "*.dll" -o -name "*.so" -o -name "*.dylib" | sort
+
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: takumi-native-all
+          path: takumi-sharp/TakumiSharp.Native/runtimes/
+          retention-days: 30
+
+  # Optional: Build and pack NuGet package
+  pack-nuget:
+    name: Pack NuGet Package
+    needs: collect-artifacts
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Download native libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: takumi-native-all
+          path: takumi-sharp/TakumiSharp.Native/runtimes/
+
+      - name: Pack NuGet package
+        working-directory: takumi-sharp/TakumiSharp.Native
+        run: dotnet pack -c Release -o ./nupkg
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: takumi-sharp/TakumiSharp.Native/nupkg/*.nupkg
+          retention-days: 30
