@@ -1,95 +1,64 @@
-# takumi-sharp
+# TakumiSharp
 
-C# bindings for [Takumi](https://github.com/kane50613/takumi), a high-performance image rendering library.
+C# bindings for [Takumi](https://github.com/kane50613/takumi), a high-performance image rendering library powered by Rust. Build beautiful images programmatically using a component-based approach with Tailwind CSS-like styling.
 
-## Project Structure
+## Installation
 
-- `takumi-native/` - Rust FFI wrapper that compiles to native libraries
-- `takumi-sharp/TakumiSharp/` - Main C# library with bindings
-- `takumi-sharp/TakumiSharp.Native/` - NuGet package containing native libraries for all platforms
-
-## Building Native Libraries
-
-The project includes build scripts to compile native libraries for multiple platforms.
-
-### Supported Platforms
-
-| .NET RID           | Platform                    | Rust Target                    |
-|--------------------|-----------------------------|--------------------------------|
-| `win-x64`          | Windows x64                 | `x86_64-pc-windows-msvc`       |
-| `win-arm64`        | Windows ARM64               | `aarch64-pc-windows-msvc`      |
-| `linux-x64`        | Linux x64 (glibc)           | `x86_64-unknown-linux-gnu`     |
-| `linux-arm64`      | Linux ARM64 (glibc)         | `aarch64-unknown-linux-gnu`    |
-| `linux-musl-x64`   | Linux x64 (musl/Alpine)     | `x86_64-unknown-linux-musl`    |
-| `linux-musl-arm64` | Linux ARM64 (musl/Alpine)   | `aarch64-unknown-linux-musl`   |
-| `osx-x64`          | macOS x64 (Intel)           | `x86_64-apple-darwin`          |
-| `osx-arm64`        | macOS ARM64 (Apple Silicon) | `aarch64-apple-darwin`         |
-
-### Prerequisites
-
-- [Rust](https://rustup.rs/) with `rustup` for managing targets
-- [.NET 10 SDK](https://dotnet.microsoft.com/download) (or later)
-
-### Build Commands
-
-#### macOS/Linux (Bash)
+Install the NuGet packages:
 
 ```bash
-# Build for current platform (auto-detected)
-./scripts/build-natives.sh
-
-# Build for all platforms
-./scripts/build-natives.sh --all
-
-# Build for specific platforms
-./scripts/build-natives.sh osx-arm64 linux-x64
-
-# Build in debug mode
-./scripts/build-natives.sh --debug osx-arm64
-
-# Clean and rebuild
-./scripts/build-natives.sh --clean --all
+dotnet add package TakumiSharp
+dotnet add package TakumiSharp.Native
 ```
 
-#### Windows (PowerShell)
+## Quick Start
 
-```powershell
-# Build for current platform (auto-detected)
-.\scripts\build-natives.ps1
+```csharp
+using TakumiSharp;
+using TakumiSharp.Models;
 
-# Build for all platforms
-.\scripts\build-natives.ps1 -All
+Takumi.LoadFont("./font.ttf");
 
-# Build for specific platforms
-.\scripts\build-natives.ps1 win-x64 linux-x64
+var byteResult = Takumi.Render(
+    node: new ContainerNode {
+        Children = [
+            new TextNode {
+                Text = "Hello World",
+                Tw = "text-3xl"
+            }
+        ],
+        Tw = "w-full h-full flex flex-col bg-white items-center justify-center"
+    },
+    width: 1920,
+    height: 1080,
+    fontSize: 16,
+    devicePixelRatio: 1,
+    format: ImageFormat.Png
+);
 
-# Build in debug mode
-.\scripts\build-natives.ps1 -Debug win-x64
-
-# Clean and rebuild
-.\scripts\build-natives.ps1 -Clean -All
+// save to file
+File.WriteAllBytes("output.png", byteResult);
 ```
 
-### CI/CD
+## Available Nodes
 
-The GitHub Actions workflow (`.github/workflows/build-natives.yml`) automatically:
-1. Builds native libraries for all platforms in parallel
-2. Collects all artifacts
-3. Optionally packs the NuGet package on main branch pushes
+- **ContainerNode** - A flex container for grouping and laying out child nodes
+- **TextNode** - Renders text with customizable styling
+- **ImageNode** - Displays images from URLs or local paths
 
-## Development
+## Styling
 
-```bash
-# Install Rust targets for cross-compilation
-rustup target add x86_64-pc-windows-msvc
-rustup target add aarch64-pc-windows-msvc
-rustup target add x86_64-unknown-linux-gnu
-rustup target add aarch64-unknown-linux-gnu
-rustup target add x86_64-unknown-linux-musl
-rustup target add aarch64-unknown-linux-musl
-rustup target add x86_64-apple-darwin
-rustup target add aarch64-apple-darwin
+TakumiSharp uses Tailwind CSS utility classes for styling. Apply styles using the `Tw` property on any node:
 
-# Build and run example
-./build-and-run-example.sh
+```csharp
+new ContainerNode {
+    Tw = "flex flex-row gap-4 p-8 bg-gradient-to-r from-blue-500 to-purple-500",
+    Children = [
+        new TextNode { Text = "Styled Text", Tw = "text-white text-2xl font-bold" }
+    ]
+}
 ```
+
+## License
+
+MIT
