@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TakumiSharp.Native", "Takum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TakumiSharp", "TakumiSharp\TakumiSharp.csproj", "{D5FEBF9C-AAA2-4C5C-9AE1-368C15CACEF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TakumiSharp.Example", "TakumiSharp.Example\TakumiSharp.Example.csproj", "{05BAE450-E720-4BF4-B9D8-4AD1948D49DB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
