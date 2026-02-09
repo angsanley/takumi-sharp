@@ -46,16 +46,6 @@ jobs:
             rust-target: aarch64-unknown-linux-gnu
             lib-name: libtakumi.so
             cross-compile: glibc-arm64
-          - rid: linux-musl-x64
-            os: ubuntu-latest
-            rust-target: x86_64-unknown-linux-musl
-            lib-name: libtakumi.so
-            cross-compile: musl-x64
-          - rid: linux-musl-arm64
-            os: ubuntu-latest
-            rust-target: aarch64-unknown-linux-musl
-            lib-name: libtakumi.so
-            cross-compile: musl-arm64
           - rid: osx-x64
             os: macos-latest
             rust-target: x86_64-apple-darwin
@@ -69,6 +59,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set HOME for Windows
+        if: runner.os == 'Windows'
+        run: echo "HOME=$env:USERPROFILE" >> $env:GITHUB_ENV
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -80,22 +74,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
-      - name: Install cross-compilation tools (Linux musl x64)
-        if: matrix.cross-compile == 'musl-x64'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-
-      - name: Install cross-compilation tools (Linux musl ARM64)
-        if: matrix.cross-compile == 'musl-arm64'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y musl-tools gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-          # Install musl cross-compiler for ARM64
-          wget -q https://musl.cc/aarch64-linux-musl-cross.tgz
-          tar -xzf aarch64-linux-musl-cross.tgz
-          echo "$PWD/aarch64-linux-musl-cross/bin" >> $GITHUB_PATH
-
       - name: Configure cross-compilation (Linux glibc ARM64)
         if: matrix.cross-compile == 'glibc-arm64'
         run: |
@@ -103,15 +81,6 @@ jobs:
           cat >> .cargo/config.toml << EOF
           [target.aarch64-unknown-linux-gnu]
           linker = "aarch64-linux-gnu-gcc"
-          EOF
-
-      - name: Configure cross-compilation (Linux musl ARM64)
-        if: matrix.cross-compile == 'musl-arm64'
-        run: |
-          mkdir -p .cargo
-          cat >> .cargo/config.toml << EOF
-          [target.aarch64-unknown-linux-musl]
-          linker = "aarch64-linux-musl-gcc"
           EOF
 
       - name: Build native library
